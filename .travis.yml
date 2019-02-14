@@ -1,162 +1,107 @@
-# This will run on Travis' 'new' container-based infrastructure
-
-# Blacklist
 branches:
   only:
-    - master
-
-# Environment variables + OS + other parameters
+  - master
 global:
-  - GH_REPO_NAME: openpose
-  - DOXYFILE: $TRAVIS_BUILD_DIR/doc/doc_autogeneration.doxygen
-  # Set this in Environment Variables on travis-ci.org
-  # - GH_REPO_REF: github.com/<user_name>/openpose.git
+- GH_REPO_NAME: openpose
+- DOXYFILE: "$TRAVIS_BUILD_DIR/doc/doc_autogeneration.doxygen"
 matrix:
-  # Use a build matrix to test many builds in parallel
-  # envvar defaults:
-  #   WITH_CMAKE: true
-  #   WITH_PYTHON: false
-  #   WITH_CUDA: true
-  #   WITH_CUDNN: true
-  #   WITH_OPEN_CL: false
-  #   WITH_MKL: false
   include:
-  # Ubuntu 16.04
-  # Ubuntu 16.04 - Python - CMake - CUDA
   - os: linux
     dist: xenial
     env: NAME="U16-python-cmake-cuda8" WITH_PYTHON=true
     sudo: required
-    # Generate and deploy documentation
     after_success:
-      - cd $TRAVIS_BUILD_DIR
-      - chmod +x scripts/generate_gh_pages.sh
-      - ./scripts/generate_gh_pages.sh
-  # Ubuntu 16.04 - Python - CMake - CPU
+    - cd $TRAVIS_BUILD_DIR
+    - chmod +x scripts/generate_gh_pages.sh
+    - "./scripts/generate_gh_pages.sh"
   - os: linux
     dist: xenial
     env: NAME="U16-python-cmake-cpu" WITH_PYTHON=true WITH_CUDA=false
     sudo: required
-  # Ubuntu 16.04 - Default - CMake - CUDA
   - os: linux
     dist: xenial
     env: NAME="U16-default-cmake-cuda8"
     sudo: required
-  # Ubuntu 16.04 - Default - CMake - CPU
   - os: linux
     dist: xenial
     env: NAME="U16-default-cmake-cpu" WITH_CUDA=false
     sudo: required
-  # Ubuntu 16.04 - Python - CMake - CPU - Debug
   - os: linux
     dist: xenial
     env: NAME="U16-python-cmake-cpu-debug" WITH_PYTHON=true WITH_CUDA=false WITH_DEBUG=true
     sudo: required
-  # Ubuntu 16.04 - Python - CMake - CPU - Unity
   - os: linux
     dist: xenial
     env: NAME="U16-python-cmake-cpu-unity" WITH_PYTHON=true WITH_UNITY=true WITH_CUDA=false
     sudo: required
-
-  # Mac OSX
-  # Mac OSX - Python - CMake - CPU
   - os: osx
-    osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    osx_image: xcode9.4
     env: NAME="OSX-python-cmake-cpu" WITH_CUDA=false WITH_PYTHON=true
     sudo: required
-  # Mac OSX - Default - CMake - CPU
   - os: osx
-    osx_image: xcode10.1 # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    osx_image: xcode10.1
     env: NAME="OSX-default-cmake-cpu" WITH_CUDA=false
     sudo: required
-  # Mac OSX - Python - CMake - CPU - Debug
   - os: osx
-    osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    osx_image: xcode9.4
     env: NAME="OSX-python-cmake-cpu-debug" WITH_CUDA=false WITH_PYTHON=true WITH_DEBUG=true
     sudo: required
-  # Mac OSX - Python - CMake - CPU - Unity
   - os: osx
-    osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    osx_image: xcode9.4
     env: NAME="OSX-python-cmake-cpu-unity" WITH_CUDA=false WITH_PYTHON=true WITH_UNITY=true
     sudo: required
-  # Mac OSX - Default - CMake - OpenCL
   - os: osx
-    osx_image: xcode10.1 # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    osx_image: xcode10.1
     env: NAME="OSX-default-cmake-opencl" WITH_CUDA=false WITH_OPEN_CL=true
     sudo: required
-
-  # # TO-DO: To be implemented
-  # # Windows
-  # # Windows - Default - CMake - CUDA
-  # - os: windows
-  #   env: NAME="W10-default-cmake-cuda8"
-
-  # Ubuntu (others)
-  # Ubuntu 16.04 - Default - Make - CUDA
   - os: linux
     dist: xenial
     env: NAME="U16-default-make-cuda8" WITH_CMAKE=false
     sudo: required
-  # # TO-DO: To be implemented
-  # # Ubuntu 16.04 - Default - CMake - CPU MKL
-  # - os: linux
-  #   dist: xenial
-  #   env: NAME="U16-default-cmake-cpu-mkl" WITH_CUDA=false WITH_MKL=true
-  #   sudo: required
-  # Ubuntu 16.04 - Default - CMake - OpenCL
   - os: linux
     dist: xenial
     env: NAME="U16-default-cmake-opencl" WITH_CUDA=false WITH_OPEN_CL=true
     sudo: required
-  # # Ubuntu 16.04 - Python - CMake - OpenCL
-  # - os: linux
-  #   dist: xenial
-  #   env: NAME="U16-python-cmake-opencl" WITH_PYTHON=true WITH_CUDA=false WITH_OPEN_CL=true
-  #   sudo: required
-  # # Unnecessary/redundant ones
-  # # Ubuntu 16.04 - Default - CMake - CUDA - no cuDNN
-  # - os: linux
-  #   dist: xenial
-  #   env: NAME="U16-default-cmake-cuda8-nocudnn" WITH_CUDNN=false
-  #   sudo: required
-  # Ubuntu 14.04 - Default - CMake - CPU
   - os: linux
     dist: trusty
     env: NAME="U14-default-cmake-cpu" WITH_CUDA=false
     sudo: required
-  # Ubuntu 14.04 - Default - Make - CUDA
   - os: linux
     dist: trusty
     env: NAME="U14-default-make-cuda8" WITH_CMAKE=false
     sudo: required
-  # # Unnecessary/redundant ones
-  # # Ubuntu 14.04 - Default - CMake - CUDA
-  # - os: linux
-  #   dist: trusty
-  #   env: NAME="U14-default-cmake-cuda8"
-  #   sudo: required
-
-# Install apt dependencies
 addons:
   apt:
     packages:
-      - doxygen
-      - doxygen-doc
-      - doxygen-latex
-      - doxygen-gui
-      - graphviz
-
-# Install Caffe and OP dependencies
+    - doxygen
+    - doxygen-doc
+    - doxygen-latex
+    - doxygen-gui
+    - graphviz
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo bash scripts/travis/install_deps_ubuntu.sh ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then bash scripts/travis/install_deps_osx.sh ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then exit 99 ; fi
-
-# Running CMake
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo bash scripts/travis/install_deps_ubuntu.sh
+  ; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then bash scripts/travis/install_deps_osx.sh
+  ; fi
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then exit 99 ; fi
 before_script:
-  - bash scripts/travis/configure.sh
-
-# Build your code e.g., by calling make
+- bash scripts/travis/configure.sh
 script:
-  - bash scripts/travis/run_make.sh
-  - bash scripts/travis/run_tests.sh
+- bash scripts/travis/run_make.sh
+- bash scripts/travis/run_tests.sh
+env:
+  global:
+  - secure: kA/nzSD0Fm+c08dR4dz+NSEzuU6yZw8thoY2tMC1HAXZp4d+s+3nmV8rydKiGHvhCaHnDopLRFB5T9kNFKZ34ej1W+Ntgv7eZwLdeQhknnBNTmLeCE8+vcsqscegJ+Qj6LJ6pcy7M1UIglmFpsLiFdwjXHR0TgDe3OKZrxmlfqQRcCo03ERILUvFMUz1LusVHsbJ7b5HFWWLoWeZ1IL1weu3/zuxSZiPddIpx4uu+QcYfNtCk+f1sji/spNU5lQQZWM5dQh61Zw0u5UUEWeDSHPoGpwWsfcidM86q70T35QMfruzYFS9aL5ZAbaoQrriS28s2h+37ig+R4jENc5tYt5oYca1OfJdOkcYBjadxxd+PU1S/sucandCZAxCQfazrUCPn2bvrwx/68cysb62rOJMZ6dicEbU2JopJ59cDCnp+P94R6elwmSdsFtKBilmRJuRnKNJf5gO404ROr1i5HGA9yOyFrQrubEznBgJTInPUIQmft3hhE3mBNEd+7zY5jbZMrLZ9rmxDLUQB3fcNNQnykvQ9lpAXkosJIg3AwbsrXYW9QdwcuYyIy/TOjKKuPkYKss5iJTiXORqyw16GhMGh/cysfpD3irLkthGtz7qllfjbBsxmsrghWmEi6dCz/4S353bmavBGlayQBPQZdvf+JoPpBLwnjDN79vL1ps=
+  - secure: Cajs4qoiDmC13mdgXh94UfJ9Etaq1lJmhCbDkfSaow7dqC5oeX/Zjnw5pHxbiiA/eJ6baK5JYrg3z/wY2V6A7YA3OS91wfVudI5jTwO+hg8E0aTAp0QDAQa9lY+1SGpH7tHVgCaLC4kEZj/DdvJdL52uzljzXD3c9EdSt9E/DSOBV0y1MFAtDzQm8fErqZLbj+/52gxepPMyblHaa4qqO44Kp0dL89m/8vkizAkplxX7C8a/kaagPFT+qXu9Lqr8Dx0eyce5aYm3y8PK/oLrTXLEKhG2ZGAs0uAnPIaZQX6cE5U20Lrbv33l4z64iOUPtOvFdKuUnNcPSsKlRBSv+DUeENknZzwd22rjCbxmR+Tsy7UpguT3PlZEy7HyyQsjtW5Y31GTJN0IS1HGCEzFg9uROJpjqRYR7JZ/S1s/2bI+TINuv8X2dCGdxxOk5AbqKG/g6j+e7e8Y1/5mAYWdnyBU0LuUDLtRGTeZjVDCrr+dh043bDvQ8UtQB7UOnIXGJ3flH41u0G6f4M/vqzF3OJlZqUIKBLdMo0pYdfQRi3QeRc+pEGVgUn5M+kDV92EhFyV9L+2o5GfmdoNTeyDryCf9LemQ2oAAKvyoKoXXS5T9Fpm7VMHG8u5+YogM1CWmTTAnxp13ShwKmUEBPDRZoJoXif+evhUgy5s9Bq5K+VU=
+  - secure: ujc5QiudpUT5+qA/y9+cIGCmp7CY5TlgEmNOTfIQESRhEe2m8/Zd4QhJgAxGOq+P0XCXdR97tDe8k8o8QaP1APLE1xNr11isuPj3nhooIV/7FtIUzLle6V72UlJUhrITjIadX5n9MaddAC9Gx+o0jTyv+thKvZP0c56iLwqYKuFL4mR1/5Sqzhr91tf6RR6XT6H0XhzIGal4fAWFHCiMEo9YHHPl2sF2DRseKlc5c5mT3waQiJCxHnZya+6+1mHuWapx76rbh+9Ku+ieqc9ntAwcqNlJI33a+ei328iYO2/Tyd7agBofc10s7FO4fKMTLh8uX8+edyhzpgTWUGEWQbp2l1qGVvDEF8yGu1a8dj4/6agYu0zt8X1ZsPzI+RqxhYbvAuhPGHlLKdsxOeK5iJ+TnCVrNrx2R7HZDdTAt9eG4shUyu8X18eEEqz5Lh61kO2JJz2l4BvtlnEUW+irly68DlJ7/QzIPPZ3kA68Jn8nVsHe7dkmRcgvOuTMR+B1LnhDXNLKRHqMnRdOetWwnr9gA9Au3R8Z7scpdMNuOlBgAKttEk3/0/sJ6uRzzLXSRPYiXCnQr7qhpZLg2ljG4bTC29bkJfqA2pjW3KKSPKE8tp/NTJ6qVZzZ9186SkkRpL7ATzW13W1AU8YZBx7kKHpcVMZKrOOqOeQQWSrf+9M=
+
+
+after_success:
+    docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+    export REPO=marc-moreaux/openpose
+    export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+    docker build -f Dockerfile -t $REPO:$COMMIT .
+    docker tag $REPO:$COMMIT $REPO:$TAG
+    docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+    docker push $REPO
+
