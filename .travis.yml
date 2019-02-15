@@ -10,17 +10,19 @@ matrix:
     dist: xenial
     env: NAME="U16-python-cmake-cuda8" WITH_PYTHON=true
     sudo: required
+    services:
+    - docker
     after_success:
     - cd $TRAVIS_BUILD_DIR
     - chmod +x scripts/generate_gh_pages.sh
     - "./scripts/generate_gh_pages.sh"
     - docker login -u $DOCKER_USER -p $DOCKER_PASS
-    - export REPO=mmoreaux/openpose
+    - export REPO=openpose
     - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
     - docker build -f Dockerfile -t $REPO:$COMMIT .
     - docker tag $REPO:$COMMIT $REPO:$TAG
     - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
-    - docker push $REPO
+    - docker push $DOCKER_USER/$REPO:$TAG
   - os: linux
     dist: xenial
     env: NAME="U16-python-cmake-cpu" WITH_PYTHON=true WITH_CUDA=false
